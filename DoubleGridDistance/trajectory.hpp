@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -38,5 +40,37 @@ struct Trajectory{
 	vector<Point> points;
 };
 
+Trajectory trajectoryFromFile(const string& filePath){
+	ifstream infile(filePath);
+	
+	unsigned skipLinesFromBeginning = 6;
+	char delimiter = ',';
+
+	vector<Point> points;
+
+	string token;
+	double latitude;
+	int tokensNum = 0;
+	double sumLat = 0;
+	while (std::getline(infile, token, delimiter)){
+		if (tokensNum % 3 == 0){
+			latitude = stod(token);
+			sumLat += latitude;
+		}
+		else if (tokensNum % 3 == 1){
+			// longitude
+			Point p(latitude, stod(token));
+			points.push_back(p);
+		}
+		else if (tokensNum % 3 == 2){
+			// timestamp
+
+		}
+		tokensNum++;
+	}
+
+	Trajectory t(points, sumLat / (double)points.size(), BB);
+	return t;
+}
 
 }
